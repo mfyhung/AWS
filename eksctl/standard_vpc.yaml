@@ -1,0 +1,32 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: cluster-config
+  region: ap-east-1
+  version: "1.22"
+vpc:
+  id: vpc-0bbeb7f8567ae0235
+  subnets:
+    public:
+      k8s-research-vpc-public-subnet-1a:
+        id: subnet-05d4bba4e08259964
+      k8s-research-vpc-public-subnet-1b:
+        id: subnet-0063b72ecddedd865
+    private:
+      k8s-research-vpc-private-subnet-1a:
+        id: subnet-08e7e5ed3df6c0b92
+      k8s-research-vpc-private-subnet-1b:
+        id: subnet-0e4e891c5f0de6e39
+nodeGroups:
+- name: general
+  labels:
+    role: general
+  instanceType: t3.large
+  desiredCapacity: 1
+  privateNetworking: true
+  ssh:
+    publicKeyName: k8s-dev-key
+  subnets:
+  - k8s-research-vpc-private-subnet-1a
+  - k8s-research-vpc-private-subnet-1b
