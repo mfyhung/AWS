@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+
+
+  pre_build:
+    commands:
+      - chmod +x configure-named-profile.sh #make files executable
+      - ls -la
+      - echo $AWS_SECRET_ACCESS_KEY
+      - echo $AWS_ACCESS_KEY_ID
+      - echo $AWS_REGION
+
+  build:
+    run-as: root
+    commands:
+      - ./configure-named-profile.sh # configure aws amed profile
+
+  post_build:
+    commands:
+      - docker build -t webserver1:latest .
+      - docker images
+      - aws ecr get-login-password --region ap-east-1 | docker login --username AWS --password-stdin 244857349068.dkr.ecr.ap-east-1.amazonaws.com
+      - docker tag webserver1:latest 244857349068.dkr.ecr.ap-east-1.amazonaws.com/cicdwebserver1:latest
+      - docker push 244857349068.dkr.ecr.ap-east-1.amazonaws.com/cicdwebserver1:latest
+      - aws eks update-kubeconfig --name k8s-dev-cluster --region ap-east-1
+      - kubectl get svc
+      - kubectl get namespace
+      - kubectl delete all --all -n webserver1
+      - kubectl apply -f webserver_deployment.yaml 

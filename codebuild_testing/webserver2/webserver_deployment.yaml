@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: webserver1
+  name: webserver2-deployment
+  labels:
+    app: webserverdev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webserverdev
+  template:
+    metadata:
+      labels:
+        app: webserverdev
+    spec:
+      containers:
+        - image: 244857349068.dkr.ecr.ap-east-1.amazonaws.com/cicdwebserver1:latest
+          name: webserver2-node
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: webserver1
+  name: webserver2-service
+spec:
+  selector:
+    app: webserverdev
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
