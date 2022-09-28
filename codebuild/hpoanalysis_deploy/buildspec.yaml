@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+
+
+  pre_build:
+    commands:
+      - chmod +x  cicd/aws_configure.sh #make files executable
+      - ls -la
+      - echo $AWS_SECRET_ACCESS_KEY
+      - echo $AWS_ACCESS_KEY_ID
+      - echo $AWS_REGION
+
+  build:
+    commands:
+      - ./cicd/aws_configure.sh # configure aws amed profile
+
+  post_build:
+    commands:
+      - docker build -t hpo-test:latest .
+      - docker images
+      - aws ecr get-login-password --region ap-east-1 | docker login --username AWS --password-stdin 244857349068.dkr.ecr.ap-east-1.amazonaws.com
+      - docker tag hpo-test:latest 244857349068.dkr.ecr.ap-east-1.amazonaws.com/hpoanalysis-test:latest
+      - docker push 244857349068.dkr.ecr.ap-east-1.amazonaws.com/hpoanalysis-test:latest
+      - aws eks update-kubeconfig --name k8s-dev-cluster --region ap-east-1
+      - kubectl get svc
+      - kubectl get namespace
+      - kubectl delete -f cicd/hpo_test_k8s_deployment.yaml --ignore-not-found=true
+      - kubectl apply -f cicd/hpo_test_k8s_deployment.yaml

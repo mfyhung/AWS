@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: hpoanalysis
+  name: hpo-test-deployment
+  labels:
+    app: hpo-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hpo-test
+  template:
+    metadata:
+      labels:
+        app: hpo-test
+    spec:
+      containers:
+        - image: 244857349068.dkr.ecr.ap-east-1.amazonaws.com/hpoanalysis-test:latest
+          name: hpo-test-node
+          ports:
+            - containerPort: 8051
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: hpoanalysis
+  name: hpo-test-service
+spec:
+  type: NodePort
+  selector:
+    app: hpo-test
+  ports:
+    - protocol: TCP
+      port: 8051
+      targetPort: 8051

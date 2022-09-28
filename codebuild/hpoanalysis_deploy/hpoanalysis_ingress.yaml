@@ -1,0 +1,37 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hpoanalysis-ingress
+  namespace: hpoanalysis
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/load-balancer-name: Hpoanalysis-k8s-alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/tags: Creator=mfyhung
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-east-1:244857349068:certificate/e67dc8b9-572e-4339-9f04-df29cd8861c2
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-FS-1-2-Res-2020-10
+spec:
+  rules:
+    - host: hpoanalysis-dev.dev.hkgenome.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hpo-dev-service
+                port:
+                  number: 8051
+
+    - host: hpoanalysis-test.dev.hkgenome.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hpo-test-service
+                port:
+                  number: 8051
